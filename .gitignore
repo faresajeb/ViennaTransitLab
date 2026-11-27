@@ -1,44 +1,37 @@
-# Python virtual environment
+
+# Python
 .venv/
 venv/
-
-# Python cache
 __pycache__/
 *.pyc
-*.pyo
+.pytest_cache/
 
-# Jupyter Notebook
-.ipynb_checkpoints/
+# Node.js
+node_modules/
+dist/
+coverage/
 
 # Environment variables and secrets
 .env
 .env.*
-
-# Allow environment template
 !.env.example
 
-# Raw and processed datasets
-data/raw/*
-data/processed/*
-!data/raw/.gitkeep
-!data/processed/.gitkeep
-
-# Testing
-.pytest_cache/
-.coverage
-htmlcov/
-
-# IDE settings
+# IDE
 .vscode/
 .idea/
 
-# Operating system files
+# Operating system
 .DS_Store
 Thumbs.db
+
+# Generated datasets
+data/raw/
+data/processed/
+*.parquet
 
 # Logs
 *.log
 
-# Frontend dependencies and builds
-node_modules/
-dist/
+# Database
+*.sqlite
+*.dump
