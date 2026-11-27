@@ -1,37 +1,51 @@
 
-# Python
+# Python virtual environments
 .venv/
 venv/
-__pycache__/
-*.pyc
-.pytest_cache/
 
-# Node.js
-node_modules/
-dist/
+# Python generated files
+__pycache__/
+*.py[cod]
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Testing and coverage
+.pytest_cache/
+.coverage
+htmlcov/
 coverage/
+
+# Node.js dependencies
+node_modules/
+
+# Frontend build output
+dist/
+*.tsbuildinfo
 
 # Environment variables and secrets
 .env
 .env.*
 !.env.example
 
-# IDE
+# Raw and processed datasets
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+*.parquet
+
+# IDE settings
 .vscode/
 .idea/
 
-# Operating system
+# Operating system files
 .DS_Store
 Thumbs.db
-
-# Generated datasets
-data/raw/
-data/processed/
-*.parquet
 
 # Logs
 *.log
 
-# Database
+# Local database files
 *.sqlite
 *.dump
