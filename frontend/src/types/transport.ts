@@ -1,8 +1,10 @@
 
 export type TransportStop = {
-  id: string;
+  stop_id: string;
+  station_id: string | null;
   name: string;
   latitude: number;
   longitude: number;
-  transport_type: string;
+  modes: string[];
+  route_ids: string[];
 };

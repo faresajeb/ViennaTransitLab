@@ -20,7 +20,16 @@ const transportColors: Record<string, string> = {
   metro: "#3b82f6",
   tram: "#ef4444",
   bus: "#22c55e",
+  rail: "#f59e0b",
 };
+
+function getStopColor(modes: string[]): string {
+  if (modes.length > 1) {
+    return "#a855f7";
+  }
+
+  return transportColors[modes[0]] ?? "#64748b";
+}
 
 function MapController({
   selectedStop,
@@ -61,20 +70,33 @@ export default function TransportMap({
 
       {stops.map((stop) => (
         <CircleMarker
-          key={stop.id}
+          key={stop.stop_id}
           center={[stop.latitude, stop.longitude]}
-          radius={selectedStop?.id === stop.id ? 11 : 8}
+          radius={
+            selectedStop?.stop_id === stop.stop_id ? 11 : 8
+          }
           pathOptions={{
             color: "#ffffff",
             weight: 2,
-            fillColor:
-              transportColors[stop.transport_type] ?? "#64748b",
+            fillColor: getStopColor(stop.modes),
             fillOpacity: 0.95,
           }}
         >
           <Popup>
             <strong>{stop.name}</strong>
-            <p>Transport: {stop.transport_type}</p>
+
+            <p>Stop ID: {stop.stop_id}</p>
+
+            <p>
+              Transport modes:{" "}
+              {stop.modes.join(", ") || "Unknown"}
+            </p>
+
+            <p>
+              Route IDs:{" "}
+              {stop.route_ids.join(", ") || "Not available"}
+            </p>
+
             <p>
               {stop.latitude.toFixed(4)},{" "}
               {stop.longitude.toFixed(4)}

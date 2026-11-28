@@ -5,7 +5,13 @@ import { getStops } from "./services/api";
 import type { TransportStop } from "./types/transport";
 import "./App.css";
 
-const filters = ["all", "metro", "tram", "bus"] as const;
+const filters = [
+  "all",
+  "metro",
+  "tram",
+  "bus",
+  "rail",
+] as const;
 
 type Filter = (typeof filters)[number];
 
@@ -27,7 +33,7 @@ function App() {
 
   const filteredStops = stops.filter((stop) => {
     const matchesType =
-      filter === "all" || stop.transport_type === filter;
+      filter === "all" || stop.modes.includes(filter);
 
     const matchesSearch = stop.name
       .toLowerCase()
@@ -38,28 +44,28 @@ function App() {
 
   const statistics = [
     {
-      label: "Total stops",
+      label: "GTFS stop records",
       value: stops.length,
       color: "#94a3b8",
     },
     {
       label: "Metro stops",
       value: stops.filter(
-        (stop) => stop.transport_type === "metro"
+        (stop) => stop.modes.includes("metro")
       ).length,
       color: "#3b82f6",
     },
     {
       label: "Tram stops",
       value: stops.filter(
-        (stop) => stop.transport_type === "tram"
+        (stop) => stop.modes.includes("tram")
       ).length,
       color: "#ef4444",
     },
     {
       label: "Bus stops",
       value: stops.filter(
-        (stop) => stop.transport_type === "bus"
+        (stop) => stop.modes.includes("bus")
       ).length,
       color: "#22c55e",
     },
@@ -94,7 +100,7 @@ function App() {
           </button>
 
           <button className="nav-item" disabled>
-            Live departures
+            Scheduled departures
             <small>Soon</small>
           </button>
         </nav>
@@ -103,7 +109,11 @@ function App() {
           <div className="connection-status">
             <span
               className={`status-dot ${
-                loading ? "pending" : error ? "offline" : "online"
+                loading
+                  ? "pending"
+                  : error
+                    ? "offline"
+                    : "online"
               }`}
             />
             {loading
@@ -112,6 +122,7 @@ function App() {
                 ? "API unavailable"
                 : "API connected"}
           </div>
+
           <span>Development · v0.1.0</span>
         </div>
       </aside>
@@ -132,7 +143,9 @@ function App() {
         </header>
 
         {loading && (
-          <div className="notice">Loading transport data...</div>
+          <div className="notice">
+            Loading transport data...
+          </div>
         )}
 
         {error && (
@@ -143,13 +156,19 @@ function App() {
           <>
             <section className="stats-grid">
               {statistics.map((stat) => (
-                <article className="stat-card" key={stat.label}>
+                <article
+                  className="stat-card"
+                  key={stat.label}
+                >
                   <span>{stat.label}</span>
+
                   <div className="stat-bottom">
                     <strong>{stat.value}</strong>
                     <div
                       className="stat-indicator"
-                      style={{ backgroundColor: stat.color }}
+                      style={{
+                        backgroundColor: stat.color,
+                      }}
                     />
                   </div>
                 </article>
@@ -161,7 +180,7 @@ function App() {
                 <div className="panel-header">
                   <div>
                     <h2>Transport network</h2>
-                    <p>Interactive station map</p>
+                    <p>Interactive GTFS stop map</p>
                   </div>
                 </div>
 
@@ -192,13 +211,33 @@ function App() {
 
                 <div className="map-legend">
                   <span>
-                    <i className="legend-dot metro" /> Metro
+                    <i className="legend-dot metro" />
+                    Metro
                   </span>
+
                   <span>
-                    <i className="legend-dot tram" /> Tram
+                    <i className="legend-dot tram" />
+                    Tram
                   </span>
+
                   <span>
-                    <i className="legend-dot bus" /> Bus
+                    <i className="legend-dot bus" />
+                    Bus
+                  </span>
+
+                  <span>
+                    <i className="legend-dot rail" />
+                    Rail
+                  </span>
+
+                  <span>
+                    <i className="legend-dot multimodal" />
+                    Multimodal
+                  </span>
+
+                  <span>
+                    <i className="legend-dot" />
+                    Unknown
                   </span>
                 </div>
               </article>
@@ -208,7 +247,8 @@ function App() {
                   <div>
                     <h2>Transport stops</h2>
                     <p>
-                      {filteredStops.length} of {stops.length} stops
+                      {filteredStops.length} of{" "}
+                      {stops.length} records
                     </p>
                   </div>
                 </div>
@@ -216,8 +256,8 @@ function App() {
                 <input
                   className="station-search"
                   type="search"
-                  placeholder="Search stations..."
-                  aria-label="Search stations"
+                  placeholder="Search stops..."
+                  aria-label="Search stops"
                   value={search}
                   onChange={(event) => {
                     setSearch(event.target.value);
@@ -228,24 +268,33 @@ function App() {
                 <div className="station-list">
                   {filteredStops.map((stop) => (
                     <button
-                      key={stop.id}
+                      key={stop.stop_id}
                       className={`station-item ${
-                        selectedStop?.id === stop.id
+                        selectedStop?.stop_id === stop.stop_id
                           ? "station-selected"
                           : ""
                       }`}
                       onClick={() => setSelectedStop(stop)}
                     >
                       <i
-                        className={`legend-dot ${stop.transport_type}`}
+                        className={`legend-dot ${
+                          stop.modes.length > 1
+                            ? "multimodal"
+                            : stop.modes[0] ?? ""
+                        }`}
                       />
 
                       <div>
                         <strong>{stop.name}</strong>
-                        <span>{stop.transport_type}</span>
+                        <span>
+                          {stop.modes.join(", ") ||
+                            "Unknown"}
+                        </span>
                       </div>
 
-                      <span className="station-arrow">›</span>
+                      <span className="station-arrow">
+                        ›
+                      </span>
                     </button>
                   ))}
 
@@ -260,13 +309,16 @@ function App() {
 
             <footer className="workspace-footer">
               ViennaTransitLab · Development preview ·
-              Data currently simulated
+              Mock GTFS stop records
             </footer>
           </>
         )}
       </main>
     </div>
   );
+  
 }
 
 export default App;
+
+
